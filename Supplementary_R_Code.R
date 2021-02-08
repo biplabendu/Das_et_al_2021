@@ -65,7 +65,7 @@ no.expression %>%
 # plot the enrichment results
 no.expression %>%
 	cflo_go_enrichment(bg=all.Cflo.genes) %>% 
-	go_enrichment_plot()
+	go_enrichment_plot(clean = "no")
 
 # list of genes that show "Low expression"
 low.expression <- setdiff(some.expression, expressed)
@@ -75,7 +75,7 @@ low.expression %>%
 # plot the enrichment results
 low.expression %>% 
   cflo_go_enrichment(bg=all.Cflo.genes) %>%
-  go_enrichment_plot()
+  go_enrichment_plot(clean="no")
   
 
 #########################################################################################
@@ -107,7 +107,9 @@ dat.n <- cflo.annots.exp %>%
 	bg.genes.n <- dat.n %>% pull(gene_name) 
 # background "expressed" genes - all
 	bg.genes <- unique(c(bg.genes.f, bg.genes.n))
-
+  ## "bg.genes" will be used as the background geneset for 
+	## further functional enrichment analyses
+	
 ## What are the uniquely expressed genes in the forager ant brain?
 ## FORAGERS
 # run enrichment 
@@ -115,7 +117,7 @@ for.only.enriched <- setdiff(bg.genes.f, bg.genes.n) %>%
     cflo_go_enrichment(bg = bg.genes) 
 # plot enrichment
 for.only.enriched %>% 
-  go_enrichment_plot(fdr = 5) 
+  go_enrichment_plot(fdr = 5, clean = "no") # set clean = "yes" to remove text annotations
 
 ## NURSES
 # run enrichment 
@@ -124,7 +126,7 @@ nur.only.enriched <-
    cflo_go_enrichment(bg = bg.genes)
 # plot enrichment
 nur.only.enriched %>% 
-  go_enrichment_plot(fdr = 5)
+  go_enrichment_plot(fdr = 5, clean = "no")
 
 
 #########################################################################################
@@ -344,6 +346,10 @@ for24.nur24.daypeaking.cluster1 <-
   filter(cluster %in% c(1)) %>% 
   pull(gene) %>% 
   cflo_go_enrichment(bg=bg.genes) 
+
+# Plot the enrichment results
+for24.nur24.daypeaking.cluster1 %>% 
+  go_enrichment_plot()
 
 #########################################################################################
 
