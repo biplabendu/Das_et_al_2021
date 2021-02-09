@@ -10,7 +10,7 @@ cflo_go_enrichment <- function(geneset, bg = "expressed", atleast = 5, enriched.
   # Load the required libraries
   library(tidyverse)
   ## load the core datasets
-  load("~/Documents/GitHub/R-scripts_zombie_ant_lab/Functions/data/TC5_core_datasets.RData")
+  load("./functions/func_data/TC5_core_datasets.RData")
   #' Select only the columns that we need
   all_genes <- cflo.annots.exp 
   all_genes <- all_genes[,c("gene_name","GOs","pfams","signalP","TMHMM")]
@@ -35,7 +35,7 @@ cflo_go_enrichment <- function(geneset, bg = "expressed", atleast = 5, enriched.
   }
   
   else if (bg == "expressed") { 
-    load(file = "~/Documents/GitHub/R-scripts_zombie_ant_lab/Functions/data/expressed_genes/cflo_expressed_genes.RData")
+    load(file = "./functions/func_data/cflo_expressed_genes.RData")
     bg <- bg.genes
     background <- all_genes_gos %>% 
       # can filter the background geneset here
@@ -188,13 +188,13 @@ cflo_go_enrichment <- function(geneset, bg = "expressed", atleast = 5, enriched.
 
 go_enrichment_plot <- function(data, category, fdr=5, clean="yes") {
   
-  source("~/Documents/GitHub/R-scripts_zombie_ant_lab/Functions/theme_publication.R")
+  source("./functions/theme_publication.R")
   
   #Save the data to an object
   df <- data
   
   # Let's read the file with all Cflo GO terms and their categories
-  cflo_gos <- read.csv("/Users/biplabendudas/OneDrive - University of Central Florida/BD-TC5/GO_annotation_files/Cflo_distinct_gos_namespace.csv", header = T, stringsAsFactors = F)
+  cflo_gos <- read.csv("./functions/func_data/Cflo_distinct_gos_namespace.csv", header = T, stringsAsFactors = F)
   cflo_gos <- cflo_gos %>% 
     dplyr::select(1:3) %>% 
     dplyr::select(GO = "GOTerm.identifier", GO_category = "GOTerm.namespace") 
@@ -319,8 +319,8 @@ cflo_heatmap <- function(geneset,
   library(viridis)
   
   # Let's load the datasets:
-  load(file = "~/Documents/GitHub/R-scripts_zombie_ant_lab/Functions/data/TC5_core_datasets.RData")
-  load(file = "~/Documents/GitHub/R-scripts_zombie_ant_lab/Functions/data/gene_to_annot.RData")
+  load(file = "./functions/func_data/TC5_core_datasets.RData")
+  load(file = "./functions/func_data/gene_to_annot.RData")
   
   oldnames.for <- names(cflo.zscores.for[,-1])
   oldnames.nur <- names(cflo.zscores.nur[,-1])
