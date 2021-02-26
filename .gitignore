@@ -5,4 +5,4 @@
 *.db
 
 # Code to ignore all the files in the "results" folder
-/results
+results/
