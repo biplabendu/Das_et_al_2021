@@ -488,21 +488,25 @@ reconstruct(my.wx, sel.period = c(24), plot.waves = F, lwd = c(1,2),
                                   labels = seq(0,95, by = 12)),
             main = "All extranidal activities (period = 24h)")
 ### Dominant periods
+png("./results/wavelet_analysis/Total_dominant_periods.png", width = 1000, height = 1800, res = 300)
 wt.avg(my.wx, 
        # maximum.level = maximum.level, 
        spec.period.axis = list(at = c(1,2,4,8,12,24,32), las=1),
        periodtck = 1, periodtcl = NULL,
-       lwd = 3, 
+       lwd = 4, 
        sigcex = c(1,1), exponent = 1,
        show.legend = F, 
        # legend.coords = "bottom",
-       main = "Total: all extranidal activities") 
+       main = "Total") 
+dev.off()
 ### Wavelet power (dominant periods with accurate timeline)
+png("./results/wavelet_analysis/Total_wavelet_power.png", width = 1400, height = 1000, res = 300)
 wt.image(my.wx, color.key = "i", n.levels = 250,
-         legend.params = list(lab = "Total extranidal"))
-
+         main = "Total")
+dev.off()
 # FS: feeding 
 ### Reconstruct the activity profile with period = 24h
+png("./results/wavelet_analysis/FS_wave_recons_12_24.png", width = 1800, height = 1000, res = 300)
 reconstruct(my.wy, sel.period = c(12,24), plot.waves = F, lwd = c(1,2),
             legend.coords = "bottomleft", show.legend = F,
             spec.time.axis = list(at = seq(1, 96, by = 12),
@@ -510,21 +514,26 @@ reconstruct(my.wy, sel.period = c(12,24), plot.waves = F, lwd = c(1,2),
             main = "Feeding bouts (period = 24h)",
             # only.sig = F, # reconstruct using 12h waveform even for non-sig time-period
             only.coi = F)
+dev.off()
 ### Dominant periods
+png("./results/wavelet_analysis/FS_dominant_periods.png", width = 1000, height = 1800, res = 300)
 wt.avg(my.wy, 
        # maximum.level = maximum.level, 
        spec.period.axis = list(at = c(1,2,4,8,12,24,32), las=1),
        periodtck = 1, periodtcl = NULL,
        # width of the line
-       lwd = 3, 
+       lwd = 4, 
        # size of the points | c(red, blue)
        sigcex = c(1,1), exponent = 1,
        show.legend = F, 
        # legend.coords = "bottomright",
-       main = "FS: feeding bouts") 
+       main = "FS") 
+dev.off()
 ### Wavelet power (dominant periods with accurate timeline)
+png("./results/wavelet_analysis/FS_wavelet_power.png", width = 1400, height = 1000, res = 300)
 wt.image(my.wz, color.key = "i", n.levels = 250,
-         legend.params = list(lab = "Feeding Stage"))
+         main="FS")
+dev.off()
 
 # FA: non-feeding extranidal activities 
 ### Reconstruct the activity profile with period = 24h
@@ -534,18 +543,22 @@ reconstruct(my.wz, sel.period = c(24), plot.waves = F, lwd = c(1,2),
                                   labels = seq(0,95, by = 12)),
             main = "Non-feeding extranidal activities (period = 24h)")
 ### Dominant periods
+png("./results/wavelet_analysis/FA_dominant_periods.png", width = 1000, height = 1800, res = 300)
 wt.avg(my.wz, 
        # maximum.level = maximum.level, 
        spec.period.axis = list(at = c(1,2,4,8,12,24,32), las=1),
        periodtck = 1, periodtcl = NULL,
-       lwd = 3, sigcex = c(1,1), exponent = 1,
+       lwd = 4, sigcex = c(1,1), exponent = 1,
        show.legend = F, 
        # legend.coords = "bottomright",
-       main = "FA: non-feeding extranidal activities") 
-### Wavelet power (dominant periods with accurate timeline)
-wt.image(my.wx, color.key = "i", n.levels = 250,
-         legend.params = list(lab = "Foraging arena - not feeding"))
+       main = "FA") 
+dev.off()
 
+### Wavelet power (dominant periods with accurate timeline)
+png("./results/wavelet_analysis/FA_wavelet_power.png", width = 1400, height = 1000, res = 300)
+wt.image(my.wx, color.key = "i", n.levels = 250,
+         main = "FA")
+dev.off()
 
 # Bivariate timeseries analysis -------------------------------------------
 
@@ -623,17 +636,18 @@ wc.sel.phases(fs.fa.2, sel.period = 24,
               main = "", sub = "", timelab = "")
 
 
-at.ph <- seq(-pi, pi, by = pi/6)
-labels.ph <- seq(-12, 12, by = 2)
+at.ph <- seq(-pi, pi, by = pi/3)
+labels.ph <- seq(-12, 12, by = 4)
 # at.t <- seq(from = as.POSIXct("2016-10-31 00:00:00", tz = "EST5EDT"),
 #             to = as.POSIXct("2016-11-06 00:00:00", tz = "EST5EDT"), by = "days")
 # labels.t <- format(at.t, format = "%a")
+png("./results/wavelet_analysis/FS_over_FA_phase_diff.png", width = 2400, height = 1400, res = 300)
 wc.sel.phases(fs.fa.2, sel.period = 24, 
               only.sig = T,
               siglvl = 0.1,
               spec.phase.axis = list(at = at.ph, labels = labels.ph),
-              timelab = "Time elapsed (hours)", 
-              phaselab = "phase (hours)",
+              timelab = "", 
+              phaselab = "Phase (hours)",
               show.legend = F,
               show.date = F, 
               # date.format = "%F %T", date.tz = "EST5EDT",
@@ -642,7 +656,7 @@ wc.sel.phases(fs.fa.2, sel.period = 24,
                                     labels = seq(0,95, by = 12)))
 abline(h = 0, col="black", lwd=1)
 # abline(v=24, col="lightgrey", lty=2)
-
+dev.off()
 
 
 # FS vs Total -------------------------------------------------------------
@@ -859,19 +873,25 @@ orlando.dat[orlando.dat$timezone == "EST",]$noon <- orlando.dat[orlando.dat$time
 orlando.dat$daylength <- strptime(orlando.dat$daylength, format = "%H:%M:%S")
 # Make a column that contains the minutes data
 orlando.dat$daylength_min <- as.numeric(orlando.dat$daylength$hour*60 + orlando.dat$daylength$min)
+
+
+# Supp_Fig_1 --------------------------------------------------------------
+png("./results/supp_fig_1/orlando_daylength.png", width = 1800, height = 800, res = 300)
 ggplot(orlando.dat)+
-  geom_point(aes(x = 1:nrow(orlando.dat), y = daylength_min/60), color=viridis::inferno(100)[75], size = 3) +
+  geom_point(aes(x = 1:nrow(orlando.dat), 
+                 y = daylength_min/60), 
+             color=viridis::inferno(100)[75], size = 2.5, alpha=0.3) +
   theme_Publication() +
   scale_color_viridis_d() +
   labs(x = "Days of 2019",
-       y = "daylength (in hours)") +
+       y = "daylength - sunrise to sunset (hours)") +
   # label the x-axis with the last day for each month; Jan ends on 31, Feb on 59, and so on.
   scale_x_continuous(breaks = c(1,31,59,90,120,151,181,212,
                                 243,273,304,334,365),
                      labels = c("Jan","Feb","Mar","Apr","May","Jun",
                                 "Jul","Aug","Sep","Oct","Nov","Dec","Jan")) +
   geom_vline(xintercept = 120, cex = 1, alpha=0.5) # Experiment starts: May (month begins on day 120)
-
+dev.off()
 
 # Twilight ----------------------------------------------------------------
 
@@ -936,20 +956,24 @@ orlando.dat$daylight_secs <- as.numeric(difftime(orlando.dat$twi.end, orlando.da
 ## Evening twilight only
 # (sunset time to end to [astro] twilight)
 eve.twi.hrs <- with(orlando.dat, difftime(twi.end, sunset, units = "hours"))
+png("./results/supp_fig_1/orlando_eve_twi.png", width = 1800, height = 800, res = 300)
 ggplot(orlando.dat)+
   geom_point(aes(x = 1:nrow(orlando.dat), 
-                 y = eve.twi.hrs*60, 
-                 color = month), size = 2.5, alpha=0.5) +
+                 y = eve.twi.hrs*60),
+             color=viridis::inferno(100)[65],
+             size = 2.5, alpha=0.5) +
   theme_Publication() +
   scale_color_viridis_d() +
   labs(x = "Days of 2019",
        y = "evening twilight (minutes)") +
   # label the x-axis with the last day for each month; Jan ends on 31, Feb on 59, and so on.
   scale_x_continuous(breaks = c(1,31,59,90,120,151,181,212,
-                                243,273,304,334,365)) +
+                                243,273,304,334,365),
+                     labels = c("Jan","Feb","Mar","Apr","May","Jun",
+                                "Jul","Aug","Sep","Oct","Nov","Dec","Jan")) +
   # ylim(1.2,1.6) +
   geom_vline(xintercept = 120, cex = 1, alpha=0.5) # Experiment starts: May (month begins on day 120)
-
+dev.off()
 
 
 ## Let's split twilight into astronomical, nautical and civil twilight

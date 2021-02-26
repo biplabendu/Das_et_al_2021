@@ -55,9 +55,16 @@ expressed <-
   filter_at(vars(starts_with("X")), any_vars(. > 1)) %>% 
   pull(gene_name)
 
+
+# no_expression -----------------------------------------------------------
+
 # list of genes that show "No expression"
 no.expression <- setdiff(all.Cflo.genes, some.expression)
 
+# Save list of genes with "no_expression"
+cflo.annots.exp %>% 
+  filter(gene_name %in% no.expression) %>% 
+  write.csv(., file = "./results/gene_lists/no_exp.csv")
 # run enrichment analysis for no.expression geneset against all Cflo genes
 no.expression %>% 
   cflo_go_enrichment(bg=all.Cflo.genes) %>% 
@@ -67,11 +74,20 @@ no.expression %>%
 	cflo_go_enrichment(bg=all.Cflo.genes) %>% 
 	go_enrichment_plot(clean = "no")
 
+
+# low_expression ----------------------------------------------------------
+
 # list of genes that show "Low expression"
 low.expression <- setdiff(some.expression, expressed)
+
+# Save list to a csv
+cflo.annots.exp %>% 
+  filter(gene_name %in% low.expression) %>% 
+  write.csv(., file = "./results/gene_lists/low_exp.csv")
+# Save enrichment results to a csv
 low.expression %>% 
   cflo_go_enrichment(bg=all.Cflo.genes) %>%
-  write.csv(., file = "~/OneDrive - University of Central Florida/BD-TC5/TC5_Paper/results_csv/enrichment_results/go_enrichments/no_exp_OR_low_exp/low_exp.csv")
+  write.csv(., file = "./results/enrichment_results/low_exp.csv")
 # plot the enrichment results
 low.expression %>% 
   cflo_go_enrichment(bg=all.Cflo.genes) %>%
@@ -112,6 +128,10 @@ dat.n <- cflo.annots.exp %>%
 	
 ## What are the uniquely expressed genes in the forager ant brain?
 ## FORAGERS
+# save the list to a csv
+cflo.annots.exp %>% 
+  filter( gene_name %in% setdiff(bg.genes.f, bg.genes.n)) %>% 
+  write.csv(., "./results/gene_lists/uniquely_exp_for.csv")
 # run enrichment 
 for.only.enriched <- setdiff(bg.genes.f, bg.genes.n) %>% 
     cflo_go_enrichment(bg = bg.genes) 
@@ -120,6 +140,10 @@ for.only.enriched %>%
   go_enrichment_plot(fdr = 5, clean = "no") # set clean = "yes" to remove text annotations
 
 ## NURSES
+# save the list to a csv
+cflo.annots.exp %>% 
+  filter( gene_name %in% setdiff(bg.genes.n, bg.genes.f)) %>% 
+  write.csv(., "./results/gene_lists/uniquely_exp_nur.csv")
 # run enrichment 
 nur.only.enriched <- 
    setdiff(bg.genes.n, bg.genes.f) %>%
