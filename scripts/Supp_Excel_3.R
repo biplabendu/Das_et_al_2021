@@ -297,7 +297,10 @@ my_gene_col.for24.nur8 <- data.frame(for24nur8_cluster = my_gene_col.for24.nur8)
 my_gene_col.for24.nur8$gene_name <- row.names(my_gene_col.for24.nur8)
 
 
-# Plot for24h-nur8h as heatmap and infer cluster identity -----------------
+
+# Identify cluster identity of Period gene --------------------------------
+
+# Plot for24h-nur8h as heatmap and infer cluster identity 
 
 # # Let's make the column annotation data frame
 # my_sample_col <- data.frame(caste = rep(c("foragers","nurses"), c(12,12)),
@@ -371,4 +374,64 @@ my_gene_col.for24.nur8 %>%
   write.csv(., "./results/supp_files/supp_file_5/for24_nur8_Cluster1_enrichedGos.csv")
 
 
+
+
+# Supp. Excel 6 -----------------------------------------------------------
+
+
+# Supp 6 - Worksheet 1 ----------------------------------------------------
+# Please note, the genes involved in mammalian circadian entrainment were 
+# obtained from KEGG pathways (KEGG pathway: hsa04713)
+
+# x <- read.delim(pipe("pbpaste"))
+# x %>% 
+#   mutate(gene_name = cflo_gene_name) %>% 
+#   select(-cflo_gene_name) %>% 
+#   left_join(cflo.annots, by="gene_name") %>% 
+#   rename(Cflo_ortholog = gene_name) %>% 
+#   arrange(Cflo_ortholog) %>%
+#   write.csv(., "./results/supp_files/supp_file_6/Cflo_ortho_mammal_circa_entrain.csv")
+
+
+
+# Supp. Excel 7 -----------------------------------------------------------
+
+
+# Supp 6 - Worksheet 1 ----------------------------------------------------
+# Results of DEG analysis using LimoRhyde, for all genes tested
+
+# The following shows all the results of the DEG analysis,
+# sorted by abs(logFC)
+
+tbl(db, "TC5_degs_all") %>% 
+  collect() %>% 
+  arrange(desc(abs(logFC))) %>% 
+  write.csv(., "./results/supp_files/supp_file_7/limorhyde_DEG_all_tested.csv")
+
+
+# Supp 7 - Worksheet 2 ----------------------------------------------------
+# All DEGs “Of these DEGs, 34 were significantly higher expressed in forager brains, 
+# and the remaining 47 were higher expressed in nurses (Fig. 8A-B; Supp. Excel 6).”
+tbl(db, "TC5_degs_all") %>% 
+  filter(significant=="yes") %>% 
+  collect() %>% 
+  arrange(upregulation, desc(abs(logFC))) %>% 
+  left_join((cflo.annots %>% 
+               select(gene_name, old_annotation, X2F:X2N)),
+            by = "gene_name") %>% 
+  write.csv(., "./results/supp_files/supp_file_7/limorhyde_DEG_sig.csv")
+
+
+# Supp 7 - Worksheet 3 ----------------------------------------------------
+# Enriched GOs for nurse-DEGs (there were no enriched GOs in forager-DEGs)
+
+tbl(db, "TC5_degs_all") %>% 
+  filter(significant=="yes") %>% 
+  collect() %>% 
+  filter(upregulation == "nur") %>% 
+  pull(gene_name) %>% 
+  cflo_go_enrichment() %>% 
+  write.csv(., "./results/supp_files/supp_file_7/nurseDEG_enrichedGOs.csv")
+
   
+
