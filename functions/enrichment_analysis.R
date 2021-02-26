@@ -349,8 +349,11 @@ cflo_heatmap <- function(geneset,
   if(annotation == T) {
     
     cflo.exp.2 <- cflo.exp %>% left_join(gene_to_annot, by="gene_name")
+    cflo.exp.2 <- 
+      cflo.exp.2 %>% 
+      mutate(annot2 <- paste0(gene_name,"| ",annot))
     
-    rownames(cflo.exp) = cflo.exp.2$annot
+    rownames(cflo.exp) = cflo.exp.2$annot2
     cflo.exp <- data.matrix(cflo.exp[-1])
     
   }

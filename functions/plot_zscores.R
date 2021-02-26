@@ -25,8 +25,13 @@ zplot <- function(gene_names, caste = "both", lwd=1.5, alpha=0.9) {
   library(tidyverse)
   library(gridExtra)
   library(ggplot2)
+  
   # load the core datasets
-  load(file = "~/Documents/GitHub/R-scripts_zombie_ant_lab/Functions/data/TC5_core_datasets.RData")
+  load(file = "./functions/func_data/TC5_core_datasets.RData")
+  
+  # load the theme_Publication() 
+  source(file="./functions/theme_publication.R")
+  
   #save the current directory 
   current.dir <- getwd()
   #change the directory to the folder where we have our zscores
