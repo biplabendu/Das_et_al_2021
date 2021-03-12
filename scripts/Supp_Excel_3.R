@@ -293,7 +293,7 @@ for24.nur8 <- as.matrix(for24.nur8[-1])
 # cluster
 my_hclust_gene.for24.nur8 <- hclust(dist(for24.nur8), method = "complete")
 my_gene_col.for24.nur8 <- cutree(tree = as.dendrogram(my_hclust_gene.for24.nur8), k = 4)
-my_gene_col.for24.nur8 <- data.frame(for24nur8_cluster = my_gene_col.for24.nur8)
+my_gene_col.for24.nur8 <- data.frame(cluster = my_gene_col.for24.nur8)
 my_gene_col.for24.nur8$gene_name <- row.names(my_gene_col.for24.nur8)
 
 
@@ -302,48 +302,49 @@ my_gene_col.for24.nur8$gene_name <- row.names(my_gene_col.for24.nur8)
 
 # Plot for24h-nur8h as heatmap and infer cluster identity 
 
-# # Let's make the column annotation data frame
-# my_sample_col <- data.frame(caste = rep(c("foragers","nurses"), c(12,12)),
-#                             phase = rep(rep(c("light", "dark", "light"), c(5,6,1)),2))
-# row.names(my_sample_col) <- colnames(for24.nur8)
-# 
-# ## For combined plot, use the following palatte
-# my_colour = list(
-#   caste = c(foragers = "#F23030", nurses = "#1A80D9"),
-#   phase = c(light = "white", dark = "#403F3D"),
-#   for24nur8_cluster = viridis::cividis(100)[c(10,35,65,80)]
-#   # overlap = c(no = "white", yes = "#D92818")
-# )
-# 
-# 
-# # Color scale
-# my.breaks = seq(min(for24.nur8), max(for24.nur8), by=0.06)
-# 
-# for24.nur8 %>% 
-#   pheatmap(show_rownames = F, 
-#            show_colnames = F,
-#            # I want to see which FORAGER cluster is the gene from
-#            annotation_row = my_gene_col.for24.nur8 %>% select(for24nur8_cluster),
-#            # both light phase and ant caste identity
-#            # annotation_col = my_sample_col,
-#            cutree_rows = 4,
-#            # cutree_cols = 2,
-#            # annotation_colors = my_colour,
-#            border_color=F,
-#            cluster_cols = F,
-#            cluster_rows = T,
-#            breaks = my.breaks,
-#            ## color scheme borrowed from: 
-#            color = inferno(length(my.breaks) - 1),
-#            # treeheight_row = 0, 
-#            # treeheight_col = 0,
-#            # remove the color scale or not
-#            # main = paste0("Foragers - circadian genes \n (n=", nrow(cflo.rhy.exp.for), " genes)"),
-#            ## annotation legend
-#            annotation_legend = T,
-#            ## Color scale
-#            legend = T)
+# Let's make the column annotation data frame
+my_sample_col <- data.frame(caste = rep(c("foragers","nurses"), c(12,12)),
+                            phase = rep(rep(c("light", "dark", "light"), c(5,6,1)),2))
+row.names(my_sample_col) <- colnames(for24.nur8)
 
+## For combined plot, use the following palatte
+my_colour = list(
+  caste = c(foragers = "#F23030", nurses = "#1A80D9"),
+  phase = c(light = "white", dark = "#403F3D"),
+  cluster = c("#A6A056", "#260101", "#F2A25C", "#732F29")
+  # overlap = c(no = "white", yes = "#D92818")
+)
+
+
+# Color scale
+my.breaks = seq(min(for24.nur8), max(for24.nur8), by=0.06)
+
+png("./results/figures/figure_4/for24nur8_all_v2.png", width = 800, height = 1400, res = 300)
+for24.nur8 %>%
+  pheatmap(show_rownames = F,
+           show_colnames = F,
+           # I want to see which FORAGER cluster is the gene from
+           annotation_row = my_gene_col.for24.nur8 %>% select(cluster),
+           # both light phase and ant caste identity
+           annotation_col = my_sample_col,
+           cutree_rows = 4,
+           # cutree_cols = 2,
+           annotation_colors = my_colour,
+           border_color=F,
+           cluster_cols = F,
+           cluster_rows = T,
+           breaks = my.breaks,
+           ## color scheme borrowed from:
+           color = inferno(length(my.breaks) - 1),
+           # treeheight_row = 0,
+           # treeheight_col = 0,
+           # remove the color scale or not
+           # main = paste0("Foragers - circadian genes \n (n=", nrow(cflo.rhy.exp.for), " genes)"),
+           ## annotation legend
+           annotation_legend = T,
+           ## Color scale
+           legend = T)
+dev.off()
 # Done.
 # Cluster 1 represents the for24h-nur8h genes that cluster with Period
 

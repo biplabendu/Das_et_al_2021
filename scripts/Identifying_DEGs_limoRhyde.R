@@ -326,16 +326,26 @@ sig.DEGs.tc5.all %>% tail() # ordered in desc by the abs(logFC)
 load(file = "./functions/func_data/gene_to_annot.RData")
 gene_to_annot %>% head()
 
+# Let's write the DEG gene_names and annotations to a file, so we can simplify blast annotations
+sig.DEGs.tc5.all %>%
+  select(gene_name) %>% 
+  left_join(gene_to_annot, by="gene_name") %>% 
+  write.csv(., "./results/gene_lists/for_nur_DEG_all.csv")
+
+# let's read the simplified annotation file 
+for_nur_DEG <- read.csv("./results/gene_lists/for_nur_DEG_all.csv", header = T, stringsAsFactors = F)
+for_nur_DEG <- for_nur_DEG[-1]
+
 deg.dat <- 
   sig.DEGs.tc5.all %>% 
   select(gene_name, logFC, for_direction) %>% 
   mutate(abslogFC = (abs(logFC))) %>%
-  left_join(gene_to_annot, by="gene_name") %>% 
-  mutate(annot1 = ifelse(gene_name==annot, NA,annot)) %>% 
-  mutate(annot2 = ifelse(is.na(annot1),gene_name,
-                         stringr::str_trunc(paste0(gene_name, "| ", annot1), 
-                                            50))) %>%  # how many characters do you want to keep
-  select(-annot1)
+  left_join(for_nur_DEG, by="gene_name") %>% 
+  # mutate(annot1 = ifelse(gene_name==annot, NA,annot)) %>% 
+  mutate(annot2 = ifelse(is.na(annot),gene_name,
+                         stringr::str_trunc(paste0(gene_name, ", ", annot), 
+                                            60)))  # how many characters do you want to keep
+
 
 ## Specify how many genes you want to do
 n.degs <- nrow(deg.dat)
@@ -407,8 +417,8 @@ deg.all <- pheatmap(dat,
                legend = T)
 
 save_pheatmap_png(deg.all, 
-                  filename = "./results/all_degs_2.png",
-                  width = 1800,
+                  filename = "./results/figures/figure_5/all_degs_3.png",
+                  width = 2000,
                   height = 3600,
                   res = 300)
 

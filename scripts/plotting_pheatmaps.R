@@ -301,10 +301,10 @@ for24nur8.heat <-
   pheatmap(show_rownames = F, 
            show_colnames = F,
            # I want to see which FORAGER cluster is the gene from
-           # annotation_row = my_gene_col.for %>% select(cluster),
+           annotation_row = my_gene_col.for %>% select(cluster),
            # both light phase and ant caste identity
            annotation_col = my_sample_col,
-           # cutree_rows = 2,
+           cutree_rows = 4,
            # cutree_cols = 2,
            annotation_colors = my_colour,
            border_color=F,
@@ -333,3 +333,33 @@ png("./results/period.png", width = 1600, height = 800, res = 300)
 c("LOC105256454") %>% # this is the gene_name for Period
   zplot(lwd=2, alpha=0.8)
 dev.off()
+
+
+# Additional File XX ------------------------------------------------------
+
+# plot daily expressions for the following genes:
+
+# 1. Dbt
+png("./results/Dbt.png", width = 1600, height = 800, res = 300)
+c("LOC105255207") %>% # this is the gene_name for Period
+  zplot(lwd=2, alpha=0.8)
+dev.off()
+
+# 2. Nemo
+png("./results/Nemo.png", width = 1600, height = 800, res = 300)
+c("LOC105248529") %>% # this is the gene_name for Period
+  zplot(lwd=2, alpha=0.8)
+dev.off()
+
+# 3. Foraging
+png("./results/Foraging.png", width = 1600, height = 800, res = 300)
+c("LOC105255628") %>% # this is the gene_name for Period
+  zplot(lwd=2, alpha=0.8)
+dev.off()
+
+# 4. Slowpoke
+png("./results/Slowpoke.png", width = 1600, height = 800, res = 300)
+c("LOC105258647") %>% # this is the gene_name for Period
+  zplot(lwd=2, alpha=0.8)
+dev.off()
+ 

@@ -15,7 +15,6 @@ source(file = "./functions/theme_publication.R")
 
 summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
                       conf.interval=.95, .drop=TRUE) {
-  library(plyr)
   
   # New version of length which can handle NA's: if na.rm==T, don't count them
   length2 <- function (x, na.rm=FALSE) {
@@ -46,7 +45,6 @@ summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
   ciMult <- qt(conf.interval/2 + .5, datac$N-1)
   datac$ci <- datac$se * ciMult
   
-  detach("package:plyr", unload=TRUE)
   return(datac)
 }
 
@@ -54,8 +52,6 @@ summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
 
 
 # Part 1 ------------------------------------------------------------------
-
-
 
 ## Format the data ------------------------------------------------------
 # let's look at what the data structure looks like
@@ -66,7 +62,7 @@ tail(dat)
 glimpse(dat)
 
 ## Selecting only the columns that I am interested in & summary of data
-dat <- dat[,c(2:4,8:10)]
+dat <- dat %>% select(Day, Phase, ZT, FS:Total)
 dat %>% head()
 summary(dat) ## We have 172 data points with NAs
 
@@ -79,7 +75,7 @@ dat %>%
   # summarize the data to see how many days of data do we have 
   group_by(Day, Phase) %>% 
   arrange(Day, Phase) %>% 
-  summarise(missing = n())
+  summarise(datapoints = n())
 
 # Let's clean up the data
 dat <-
@@ -90,12 +86,15 @@ dat <-
   na.omit() %>% 
   # keep only the days post painting
   # Three phases: Entrain-II (Entrainment post disturbance), Sampling (during a disturbance), and Entrain-III (Entrainment post disturbance as well)
-  filter(Phase %in% c("Painting" ,"Entrain-II", "Sampling", "Entrain-III"))
+  filter(Phase %in% c("Entrain-I", "Painting" ,"Entrain-II", "Sampling", "Entrain-III"))
 # # Two of the other phases: Blasting and Entrain-I
 # filter(!Phase %in% c("Painting" ,"Entrain-II", "Sampling", "Entrain-III"))
 
 # Summarise
-summary(dat)
+dat %>% 
+  group_by(Day, Phase) %>% 
+  arrange(Day, Phase) %>% 
+  summarise(datapoints = n())
 
 # Correctly format the columns
 dat$Day <- as.factor(dat$Day)
@@ -103,69 +102,111 @@ dat$ZT <- as.factor(dat$ZT)
 dat$FA <- as.numeric(dat$FA)
 dat$FS <- as.numeric(dat$FS)
 dat$Total <- as.numeric(dat$Total)
-dat$Phase <- factor(dat$Phase, levels=c("Painting","Entrain-II","Sampling","Entrain-III"))
+dat$Phase <- factor(dat$Phase, levels=c("Entrain-I","Painting","Entrain-II","Sampling","Entrain-III"))
 
 dat %>% head()
 dat %>% glimpse()
 
-# ## Activity in BLASTING and ENTRAIN-I phase 
-# xdac.blast <- summarySE(data=dat, measurevar= "FS", groupvars=c("ZT","Phase"))
-# 
-# pd <- position_dodge(0.1)
-# ggplot(xdac.blast, 
-#        aes(x= as.numeric(as.character(ZT)), y=FS)) +
-#   theme_Publication() +
-#   scale_colour_Publication() +
-#   xlab("Time (ZT)") +
-#   ylab("Mean (±SE) ants") +
-#   ggtitle("Feeding activity (Before painting)") +
-#   theme(text = element_text(size = 20, colour = 'black'),
-#         axis.title.x = element_text(size = 17, colour = 'black'),
-#         axis.title.y = element_text(size = 17, colour = 'black'),
-#         legend.position='none',
-#         legend.title = element_text(size = 15, colour = 'black'),
-#         legend.text = element_text(size = 12, colour = 'black')) +
-#   ## center align the title
-#   theme(plot.title = element_text(hjust = 0.5)) +
-#   scale_x_continuous(breaks = c(0,12,24)) +
-#   #scale_y_continuous(limits = c(0,40)) +
-#   theme(panel.grid.major.x = element_line(colour = "#808080", size=0.1),
-#         panel.grid.major.y = element_line(colour = "#808080", size=0.2)) +
-#   ## if you need highlighting parts of the graph
-#   geom_rect(aes(xmin = 11.8, xmax = 23.8, ymin = -Inf, ymax = Inf),
-#             fill = "lightgrey", alpha = 0.02, color=NA) +
-#   geom_line(position=pd, 
-#             col="#F20505", size=3, alpha=1) +
-#   ## Add error bar here
-#   geom_errorbar(aes(ymin=FS-sd, ymax=FS+sd), width=.2, position=pd, col="#0D0D0D", alpha = 0.3) +
-#   geom_point(position=pd, size=6, aes(fill=as.factor(Phase), shape = as.factor(Phase)), 
-#              size=10, show.legend = F, color="black", pch=21) +
-#   #facet_wrap(~Phase, nrow=2)
-#   scale_fill_manual(values = c("black","#F20505","#F2CB05","#0FBF67")) +
-#   scale_color_manual(values=c("#F20505","#F5D736","#0FBF67")) + 
-#   theme(text = element_text(size = 20, colour = 'black'),
-#         legend.position = "none") 
 
+# Entrain-I (Initial entrainment) --------------
 
-## Activity - PAINTING phase ------
-xdac.painting <- summarySE(data=dat[dat$Phase=="Painting",], measurevar= "FA", groupvars=c("ZT","Phase"))
+## The colony was allowed to entrain, undisturbed for four days (Days 4-7),
+## following which the colony was disturbed to change the arena setup
+## Therefore, we will calculate the mean (±SE) using data from Days 4-7 only
+
 
 pd <- position_dodge(0.1)
-ggplot(xdac.painting, 
-       aes(x= as.numeric(as.character(ZT)), y=FA)) +
+
+png("./results/figures/figure_1/Entrain_I_FA.png", 
+    width = 1400, height = 800, res = 300)
+# create summary
+dat %>% 
+  filter(Phase == "Entrain-I") %>% 
+  filter(Day %in% c(4:7)) %>% 
+    
+  # make the summary table
+  summarySE(.,
+              # specify your measurevar (FA/FS/Total)
+              measurevar= "FA", 
+              groupvars=c("ZT","Phase")) %>%
+    
+    # make the value column
+    mutate(value=FA) %>% 
+    
+  # Plot
+  ggplot(aes(x= as.numeric(as.character(ZT)), y=value)) +
+    theme_Publication() +
+    scale_colour_Publication() +
+    xlab("") +
+    ylab("") +
+    ggtitle("") +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          legend.position='none',
+          # legend.title = element_text(size = 15, colour = 'black'),
+          legend.text = element_blank()) +
+    ## center align the title
+    theme(plot.title = element_blank()) +
+    scale_x_continuous(breaks = c(0,12,24)) +
+    #scale_y_continuous(limits = c(0,40)) +
+    theme(panel.grid.major.x = element_line(colour = "#808080", size=0.1),
+          panel.grid.major.y = element_line(colour = "#808080", size=0.2)) +
+    ## if you need highlighting parts of the graph
+    geom_rect(aes(xmin = 11.8, xmax = 23.8, ymin = -Inf, ymax = Inf),
+              fill = "lightgrey", alpha = 0.02, color=NA) +
+    geom_line(position=pd,
+              # col="#F2CB05", size=2, alpha=1) + # total
+              # col="#BF0404", size=2, alpha=1) + # FS
+              col="#0FBF67", size=2, alpha=1) + # FA
+              
+    
+    ## Add error bar here
+    geom_errorbar(aes(ymin=value-se, ymax=value+se), 
+                  width=.4, position=pd, col="black", alpha = 0.7) +
+    
+    # Add the points on top of the error bars
+    geom_point(position=pd, size=2.5,
+               col="black", fill="black",
+               show.legend = F, color="black", pch=21, alpha=0.9) +
+    
+    #facet_wrap(~Phase, nrow=2)
+    # scale_fill_manual(values = c("black","#F20505","#F2CB05","#0FBF67")) +
+    # scale_color_manual(values=c("#F20505","#F5D736","#0FBF67")) +
+    theme(text = element_text(size = 25, colour = 'black'),
+          legend.position = "none")
+dev.off()
+
+
+# Painting (Mark and recapture) --------------
+pd <- position_dodge(0.1)
+
+png("./results/figures/figure_1/Painting_Total.png", 
+    width = 1400, height = 800, res = 300)
+# create summary
+summarySE(data=(dat %>% 
+                  filter(Phase == "Painting")), 
+          
+          # specify your measurevar (FA/FS/Total)
+          measurevar= "Total", 
+          groupvars=c("ZT","Phase")) %>%
+  
+  # make the value column
+  mutate(value=Total) %>% 
+  
+  # Plot
+  ggplot(aes(x= as.numeric(as.character(ZT)), y=value)) +
   theme_Publication() +
   scale_colour_Publication() +
-  xlab("Time (ZT)") +
-  ylab("Mean (±SE) ants") +
-  ggtitle("Feeding activity (Painting foragers)") +
-  theme(text = element_text(size = 20, colour = 'black'),
-        axis.title.x = element_text(size = 17, colour = 'black'),
-        axis.title.y = element_text(size = 17, colour = 'black'),
+  xlab("") +
+  ylab("") +
+  ggtitle("") +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
         legend.position='none',
-        legend.title = element_text(size = 15, colour = 'black'),
-        legend.text = element_text(size = 12, colour = 'black')) +
+        # legend.title = element_text(size = 15, colour = 'black'),
+        legend.text = element_blank()) +
   ## center align the title
-  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(plot.title = element_blank()) +
   scale_x_continuous(breaks = c(0,12,24)) +
   #scale_y_continuous(limits = c(0,40)) +
   theme(panel.grid.major.x = element_line(colour = "#808080", size=0.1),
@@ -173,133 +214,59 @@ ggplot(xdac.painting,
   ## if you need highlighting parts of the graph
   geom_rect(aes(xmin = 11.8, xmax = 23.8, ymin = -Inf, ymax = Inf),
             fill = "lightgrey", alpha = 0.02, color=NA) +
-  geom_line(position=pd, 
-            col="#F20505", size=3, alpha=1) +
-  geom_errorbar(aes(ymin=FA-sd, ymax=FA+sd), width=.2, position=pd, col="#0D0D0D", alpha = 0.3) +
-  geom_point(position=pd, size=6, aes(fill=as.factor(Phase), shape = as.factor(Phase)), 
-             size=10, show.legend = F, color="black", pch=21) +
-  #facet_wrap(~Phase, nrow=2)
-  scale_fill_manual(values = c("#F2CB05","#0FBF67")) +
-  scale_color_manual(values=c("#F5D736","#0FBF67")) + 
-  theme(text = element_text(size = 20, colour = 'black'),
-        legend.position = "none")  
-
-# Plot the activity-diff for the three phases
-
-# Summarize the activity
-
-## Total Extranidal activity (TOTAL) ------
-xdat.tot <- summarySE(data=dat, measurevar= "Total", groupvars=c("ZT","Phase"))
-tail(xdat.tot)
-# Plot 
-pd <- position_dodge(0.1)
-ggplot(xdat.tot[xdat.tot$Phase=="Entrain-III",], 
-       aes(x= as.numeric(as.character(ZT)), y=Total)) +
-  theme_Publication() +
-  scale_colour_Publication() +
-  xlab("Time (ZT)") +
-  ylab("Mean (±SE) ants") +
-  ggtitle("Total extranidal activity (After sampling)") +
-  theme(text = element_text(size = 20, colour = 'black'),
-        axis.title.x = element_text(size = 17, colour = 'black'),
-        axis.title.y = element_text(size = 17, colour = 'black'),
-        legend.position='none',
-        legend.title = element_text(size = 15, colour = 'black'),
-        legend.text = element_text(size = 12, colour = 'black')) +
-  ## center align the title
-  theme(plot.title = element_text(hjust = 0.5)) +
-  scale_x_continuous(breaks = c(0,12,24)) +
-  #scale_y_continuous(limits = c(0,40)) +
-  theme(panel.grid.major.x = element_line(colour = "#808080", size=0.1),
-        panel.grid.major.y = element_line(colour = "#808080", size=0.2)) +
-  ## if you need highlighting parts of the graph
-  geom_rect(aes(xmin = 11.8, xmax = 23.8, ymin = -Inf, ymax = Inf),
-            fill = "lightgrey", alpha = 0.02, color=NA) +
-  geom_line(position=pd, 
-            col="#F20505", size=3, alpha=1) +
-  geom_errorbar(aes(ymin=Total-sd, ymax=Total+sd), width=.2, position=pd, col="#0D0D0D", alpha = 0.3) +
-  geom_point(position=pd, size=6, aes(fill=as.factor(Phase), shape = as.factor(Phase)), 
-             size=10, show.legend = F, color="black", pch=21) +
-  #facet_wrap(~Phase, nrow=2)
-  scale_fill_manual(values = c("#F2CB05","#0FBF67")) +
-  scale_color_manual(values=c("#F5D736","#0FBF67")) + 
-  theme(text = element_text(size = 20, colour = 'black'),
-        legend.position = "none") 
-# # set transparency
-# theme(
-#   panel.grid.major = element_blank(), 
-#   panel.grid.minor = element_blank(),
-#   panel.background = element_rect(fill = "transparent",colour = NA),
-#   plot.background = element_rect(fill = "transparent",colour = NA)
-# )
-
-## Extranidal feeding activity (FS) --------
-xdat.fs <- summarySE(data=dat, measurevar= "FS", groupvars=c("ZT","Phase"))
-tail(xdat.fs)
-# Plot 
-pd <- position_dodge(0.1)
-ggplot(xdat.fs[xdat.fs$Phase=="Entrain-III",], 
-       aes(x= as.numeric(as.character(ZT)), y=FS)) +
-  theme_Publication() +
-  scale_colour_Publication() +
-  xlab("Time (ZT)") +
-  ylab("Mean (±SE) ants") +
-  ggtitle("Feeding activity (After sampling)") +
-  theme(text = element_text(size = 20, colour = 'black'),
-        axis.title.x = element_text(size = 17, colour = 'black'),
-        axis.title.y = element_text(size = 17, colour = 'black'),
-        legend.position='none',
-        legend.title = element_text(size = 15, colour = 'black'),
-        legend.text = element_text(size = 12, colour = 'black')) +
-  ## center align the title
-  theme(plot.title = element_text(hjust = 0.5)) +
-  scale_x_continuous(breaks = c(0,12,24)) +
-  #scale_y_continuous(limits = c(0,40)) +
-  theme(panel.grid.major.x = element_line(colour = "#808080", size=0.1),
-        panel.grid.major.y = element_line(colour = "#808080", size=0.2)) +
-  ## if you need highlighting parts of the graph
-  geom_rect(aes(xmin = 11.8, xmax = 23.8, ymin = -Inf, ymax = Inf),
-            fill = "lightgrey", alpha = 0.02, color=NA) +
-  geom_line(position=pd, 
-            col="#F20505", size=3, alpha=1) +
+  geom_line(position=pd,
+            col="#F2CB05", size=2, alpha=1) + # total
+            # col="#BF0404", size=2, alpha=1) + # FS
+            # col="#0FBF67", size=2, alpha=1) + # FA
+  
+  
   ## Add error bar here
-  geom_errorbar(aes(ymin=FS-sd, ymax=FS+sd), width=.2, position=pd, col="#0D0D0D", alpha = 0.3) +
-  geom_point(position=pd, size=6, aes(fill=as.factor(Phase), shape = as.factor(Phase)), 
-             size=10, show.legend = F, color="black", pch=21) +
+  geom_errorbar(aes(ymin=value-se, ymax=value+se), 
+                width=.4, position=pd, col="black", alpha = 0.7) +
+  
+  # Add the points on top of the error bars
+  geom_point(position=pd, size=2.5,
+             col="black", fill="black",
+             show.legend = F, color="black", pch=21, alpha=0.9) +
+  
   #facet_wrap(~Phase, nrow=2)
-  scale_fill_manual(values = c("black","#F20505","#F2CB05","#0FBF67")) +
-  scale_color_manual(values=c("#F20505","#F5D736","#0FBF67")) + 
-  theme(text = element_text(size = 20, colour = 'black'),
-        legend.position = "none") 
-# # set transparency
-# theme(
-#   panel.grid.major = element_blank(), 
-#   panel.grid.minor = element_blank(),
-#   panel.background = element_rect(fill = "transparent",colour = NA),
-#   plot.background = element_rect(fill = "transparent",colour = NA)
-# )
+  # scale_fill_manual(values = c("black","#F20505","#F2CB05","#0FBF67")) +
+  # scale_color_manual(values=c("#F20505","#F5D736","#0FBF67")) +
+  theme(text = element_text(size = 25, colour = 'black'),
+        legend.position = "none")
+dev.off()
 
-## Extranidal non-feeding activity (FA) ------------
-xdat.fa <- summarySE(data=dat, measurevar= "FA", groupvars=c("ZT","Phase"))
-tail(xdat.fa)
 
-# Plot 
+# Entrain-II (Continued entrainment/Pre-sampling entrainment) --------------
 pd <- position_dodge(0.1)
-ggplot(xdat.fa[xdat.fa$Phase=="Entrain-III",], 
-       aes(x= as.numeric(as.character(ZT)), y=FA)) +
+
+png("./results/figures/figure_1/Entrain_II_FA.png", 
+    width = 1400, height = 800, res = 300)
+# create summary
+summarySE(data=(dat %>% 
+                  filter(Phase == "Entrain-II")), 
+          
+          # specify your measurevar (FA/FS/Total)
+          measurevar= "FA", 
+          groupvars=c("ZT","Phase")) %>%
+  
+  # make the value column
+  mutate(value=FA) %>% 
+  
+  # Plot
+  ggplot(aes(x= as.numeric(as.character(ZT)), y=value)) +
   theme_Publication() +
   scale_colour_Publication() +
-  xlab("Time (ZT)") +
-  ylab("Mean (±SE) ants") +
-  ggtitle("Non-feeding activity (After sampling, n=2)") +
-  theme(text = element_text(size = 20, colour = 'black'),
-        axis.title.x = element_text(size = 17, colour = 'black'),
-        axis.title.y = element_text(size = 17, colour = 'black'),
+  xlab("") +
+  ylab("") +
+  ggtitle("") +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
         legend.position='none',
-        legend.title = element_text(size = 15, colour = 'black'),
-        legend.text = element_text(size = 12, colour = 'black')) +
+        # legend.title = element_text(size = 15, colour = 'black'),
+        legend.text = element_blank()) +
   ## center align the title
-  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(plot.title = element_blank()) +
   scale_x_continuous(breaks = c(0,12,24)) +
   #scale_y_continuous(limits = c(0,40)) +
   theme(panel.grid.major.x = element_line(colour = "#808080", size=0.1),
@@ -307,28 +274,161 @@ ggplot(xdat.fa[xdat.fa$Phase=="Entrain-III",],
   ## if you need highlighting parts of the graph
   geom_rect(aes(xmin = 11.8, xmax = 23.8, ymin = -Inf, ymax = Inf),
             fill = "lightgrey", alpha = 0.02, color=NA) +
-  geom_line(position=pd, 
-            col="#0FBF67", size=3, alpha=1) +
+  geom_line(position=pd,
+            # col="#F2CB05", size=2, alpha=1) + # total
+            # col="#BF0404", size=2, alpha=1) + # FS
+            col="#0FBF67", size=2, alpha=1) + # FA
+  
+  
   ## Add error bar here
-  geom_errorbar(aes(ymin=FA-sd, ymax=FA+sd), width=.2, position=pd, col="#0D0D0D", alpha = 0.3) +
-  geom_point(position=pd, size=6, aes(fill=as.factor(Phase), shape = as.factor(Phase)), 
-             size=10, show.legend = F, color="black", pch=21) +
+  geom_errorbar(aes(ymin=value-se, ymax=value+se), 
+                width=.4, position=pd, col="black", alpha = 0.7) +
+  
+  # Add the points on top of the error bars
+  geom_point(position=pd, size=2.5,
+             col="black", fill="black",
+             show.legend = F, color="black", pch=21, alpha=0.9) +
+  
   #facet_wrap(~Phase, nrow=2)
-  scale_fill_manual(values = c("black","#F20505","#F2CB05","#0FBF67")) +
-  scale_color_manual(values=c("#F20505","#F5D736","#0FBF67")) + 
-  theme(text = element_text(size = 20, colour = 'black'),
+  # scale_fill_manual(values = c("black","#F20505","#F2CB05","#0FBF67")) +
+  # scale_color_manual(values=c("#F20505","#F5D736","#0FBF67")) +
+  theme(text = element_text(size = 25, colour = 'black'),
+        legend.position = "none")
+dev.off()
+
+
+# Sampling (24h of Sampling) --------------
+pd <- position_dodge(0.1)
+
+png("./results/figures/figure_1/Sampling_Total.png", 
+    width = 1400, height = 800, res = 300)
+# create summary
+summarySE(data=(dat %>% 
+                  filter(Phase == "Sampling")), 
+          
+          # specify your measurevar (FA/FS/Total)
+          measurevar= "Total", 
+          groupvars=c("ZT","Phase")) %>%
+  
+  # make the value column
+  mutate(value=Total) %>% 
+  
+  # Plot
+  ggplot(aes(x= as.numeric(as.character(ZT)), y=value)) +
+  theme_Publication() +
+  scale_colour_Publication() +
+  xlab("") +
+  ylab("") +
+  ggtitle("") +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.position='none',
+        # legend.title = element_text(size = 15, colour = 'black'),
+        legend.text = element_blank()) +
+  ## center align the title
+  theme(plot.title = element_blank()) +
+  scale_x_continuous(breaks = c(0,12,24)) +
+  #scale_y_continuous(limits = c(0,40)) +
+  theme(panel.grid.major.x = element_line(colour = "#808080", size=0.1),
+        panel.grid.major.y = element_line(colour = "#808080", size=0.2)) +
+  ## if you need highlighting parts of the graph
+  geom_rect(aes(xmin = 11.8, xmax = 23.8, ymin = -Inf, ymax = Inf),
+            fill = "lightgrey", alpha = 0.02, color=NA) +
+  geom_line(position=pd,
+            col="#F2CB05", size=2, alpha=1) + # total
+            # col="#BF0404", size=2, alpha=1) + # FS
+            # col="#0FBF67", size=2, alpha=1) + # FA
+  
+  
+  ## Add error bar here
+  geom_errorbar(aes(ymin=value-se, ymax=value+se), 
+                width=.4, position=pd, col="black", alpha = 0.7) +
+  
+  # Add the points on top of the error bars
+  geom_point(position=pd, size=2.5,
+             col="black", fill="black",
+             show.legend = F, color="black", pch=21, alpha=0.9) +
+  
+  #facet_wrap(~Phase, nrow=2)
+  # scale_fill_manual(values = c("black","#F20505","#F2CB05","#0FBF67")) +
+  # scale_color_manual(values=c("#F20505","#F5D736","#0FBF67")) +
+  theme(text = element_text(size = 25, colour = 'black'),
+        legend.position = "none")
+dev.off()
+
+
+# Entrain-III (Post-sampling entrainment) --------------
+pd <- position_dodge(0.1)
+
+png("./results/figures/figure_1/Entrain_III_FA.png", 
+    width = 1400, height = 800, res = 300)
+# create summary
+summarySE(data=(dat %>% 
+                  filter(Phase == "Entrain-III")), 
+          
+          # specify your measurevar (FA/FS/Total)
+          measurevar= "FA", 
+          groupvars=c("ZT","Phase")) %>%
+  
+  # make the value column
+  mutate(value=FA) %>% 
+  
+  # Plot
+  ggplot(aes(x= as.numeric(as.character(ZT)), y=value)) +
+  theme_Publication() +
+  scale_colour_Publication() +
+  xlab("") +
+  ylab("") +
+  ggtitle("") +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.position='none',
+        # legend.title = element_text(size = 15, colour = 'black'),
+        legend.text = element_blank()) +
+  ## center align the title
+  theme(plot.title = element_blank()) +
+  scale_x_continuous(breaks = c(0,12,24)) +
+  #scale_y_continuous(limits = c(0,40)) +
+  theme(panel.grid.major.x = element_line(colour = "#808080", size=0.1),
+        panel.grid.major.y = element_line(colour = "#808080", size=0.2)) +
+  ## if you need highlighting parts of the graph
+  geom_rect(aes(xmin = 11.8, xmax = 23.8, ymin = -Inf, ymax = Inf),
+            fill = "lightgrey", alpha = 0.02, color=NA) +
+  geom_line(position=pd,
+            # col="#F2CB05", size=2, alpha=1) + # total
+            # col="#BF0404", size=2, alpha=1) + # FS
+            col="#0FBF67", size=2, alpha=1) + # FA
+  
+  
+  ## Add error bar here
+  geom_errorbar(aes(ymin=value-se, ymax=value+se), 
+                width=.4, position=pd, col="black", alpha = 0.7) +
+  
+  # Add the points on top of the error bars
+  geom_point(position=pd, size=2.5,
+             col="black", fill="black",
+             show.legend = F, color="black", pch=21, alpha=0.9) +
+  
+  # set y-axis breaks
+  scale_y_continuous(breaks = seq(0, 14, by = 3)) +
+  
+  #facet_wrap(~Phase, nrow=2)
+  # scale_fill_manual(values = c("black","#F20505","#F2CB05","#0FBF67")) +
+  # scale_color_manual(values=c("#F20505","#F5D736","#0FBF67")) +
+  theme(text = element_text(size = 25, colour = 'black'),
         legend.position = "none") 
-# # set transparency
-# theme(
-#   panel.grid.major = element_blank(), 
-#   panel.grid.minor = element_blank(),
-#   panel.background = element_rect(fill = "transparent",colour = NA),
-#   plot.background = element_rect(fill = "transparent",colour = NA)
-# )
+dev.off()
 
 
 
+# Calculating number of observations per phase ----------------------------
 
+# Summarise
+dat %>% 
+  filter(Day != c(8,9)) %>% 
+  group_by(Phase) %>% 
+  arrange(Phase) %>% 
+  summarise(datapoints = n())
 
 
 # Wavelet analysis --------------------------------------------------------
