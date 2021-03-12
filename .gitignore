@@ -6,3 +6,5 @@
 
 # Code to ignore all the files in the "results" folder
 results/
+results/enrichment_results/rhythmic_genes/nur24_nightpeaking_cluster2.csv
+results/enrichment_results/rhythmic_genes/nur24_nightpeaking_cluster3.csv
