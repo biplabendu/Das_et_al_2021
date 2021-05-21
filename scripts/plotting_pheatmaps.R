@@ -362,4 +362,46 @@ png("./results/Slowpoke.png", width = 1600, height = 800, res = 300)
 c("LOC105258647") %>% # this is the gene_name for Period
   zplot(lwd=2, alpha=0.8)
 dev.off()
+
+# 5. Dop2R "LOC105254705"
+png("./results/Dop2R.png", width = 1600, height = 800, res = 300)
+c("LOC105254705") %>% # this is the gene_name for Period
+  zplot(lwd=2, alpha=0.8)
+dev.off()
+
+# 6. 5-HT7 "LOC105255859"
+png("./results/serotonin_receptor.png", width = 1600, height = 800, res = 300)
+c("LOC105255859") %>% # this is the gene_name for Period
+  zplot(lwd=2, alpha=0.8)
+dev.off()
+
+# 7. Arylphorin subunit alpha "LOC105250772"
+png("./results/arylphorin.png", width = 1600, height = 800, res = 300)
+c("LOC105250772") %>% # this is the gene_name for Period
+  zplot(lwd=2, alpha=0.8)
+dev.off()
+
+# 8. mediator of RNA polymerase II transcription subunit alpha 12 "LOC105256665"
+png("./results/med12.png", width = 1600, height = 800, res = 300)
+c("LOC105256665") %>% # this is the gene_name for Period
+  zplot(lwd=2, alpha=0.8)
+dev.off()
+
+# 9. CREG1 "LOC105253296"
+png("./results/CREG1.png", width = 1600, height = 800, res = 300)
+c("LOC105253296") %>% # this is the gene_name for Period
+  zplot(lwd=2, alpha=0.8)
+dev.off()
+
+# 10. Mth2 "LOC105253359"
+png("./results/Mth2.png", width = 1600, height = 800, res = 300)
+c("LOC105253359") %>% # this is the gene_name for Period
+  zplot(lwd=2, alpha=0.8)
+dev.off()
+
+# 11. IlpR "LOC112639821"
+png("./results/IlpR.png", width = 1600, height = 800, res = 300)
+c("LOC112639821") %>% # this is the gene_name for Period
+  zplot(lwd=2, alpha=0.8)
+dev.off()
  

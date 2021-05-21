@@ -326,14 +326,14 @@ sig.DEGs.tc5.all %>% tail() # ordered in desc by the abs(logFC)
 load(file = "./functions/func_data/gene_to_annot.RData")
 gene_to_annot %>% head()
 
-# Let's write the DEG gene_names and annotations to a file, so we can simplify blast annotations
-sig.DEGs.tc5.all %>%
-  select(gene_name) %>% 
-  left_join(gene_to_annot, by="gene_name") %>% 
-  write.csv(., "./results/gene_lists/for_nur_DEG_all.csv")
+# # Let's write the DEG gene_names and annotations to a file, so we can simplify blast annotations
+# sig.DEGs.tc5.all %>%
+#   select(gene_name) %>% 
+#   left_join(gene_to_annot, by="gene_name") %>% 
+#   write.csv(., "./results/gene_lists/for_nur_DEG_all.csv")
 
 # let's read the simplified annotation file 
-for_nur_DEG <- read.csv("./results/gene_lists/for_nur_DEG_all.csv", header = T, stringsAsFactors = F)
+for_nur_DEG <- read.csv("./results/gene_lists/for_nur_DEG_all_2.csv", header = T, stringsAsFactors = F)
 for_nur_DEG <- for_nur_DEG[-1]
 
 deg.dat <- 
@@ -354,9 +354,9 @@ dat <- deg.dat %>%
   head(n.degs)
 
 # Load genes that code for the most abundant TF in Cflo
-tf.genes <- read.csv("./data/most_abundant_TF_Cflo.csv", header = F, stringsAsFactors = F)
-tf.genes <- tf.genes[,1, drop=T]
+tf.genes <- read.csv("./data/most_abundant_TF_Cflo.csv", header = F, stringsAsFactors = F, na.strings = c("NA"))
 tf.genes <- na.omit(tf.genes)
+tf.genes <- tf.genes[,1, drop=T]
 
 # Make annotations for the heatmaps
 my_gene_col.for <- data.frame(
@@ -369,7 +369,8 @@ my_gene_col.for <- data.frame(
                                       intersect(for8,nur24),
                                       intersect(for8,nur12)), "yes","no"),
    Troph = ifelse(dat$gene_name %in% tf.genes, "yes", "no"),
-   DEG = ifelse(dat$for_direction=="down","nurse","forager"))
+   DEG = ifelse(dat$for_direction=="down","nurse","forager")) %>% 
+  select(Troph, DRG, Rhy, DEG)
 
 row.names(my_gene_col.for) <- dat$annot2
 
@@ -417,7 +418,7 @@ deg.all <- pheatmap(dat,
                legend = T)
 
 save_pheatmap_png(deg.all, 
-                  filename = "./results/figures/figure_5/all_degs_3.png",
+                  filename = "./results/figures/figure_5/all_degs_5.png",
                   width = 2000,
                   height = 3600,
                   res = 300)
