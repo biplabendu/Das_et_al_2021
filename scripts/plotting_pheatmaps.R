@@ -120,7 +120,7 @@ my_colour.nur = list(
 my.breaks = seq(-3, max(cflo.rhy.exp.for), by=0.06)
 
 # Let's plot!
-png("./results/for24_all.png", width = 1000, height = 1600, res = 300)
+# png("./results/for24_all.png", width = 1000, height = 1600, res = 300)
 for.rhy.heat <- pheatmap(cflo.rhy.exp.for, show_rownames = F, show_colnames = F,
                          annotation_row = my_gene_col.for, 
                          annotation_col = my_sample_col.for,
@@ -140,7 +140,7 @@ for.rhy.heat <- pheatmap(cflo.rhy.exp.for, show_rownames = F, show_colnames = F,
                          annotation_legend = T,
                          ## Color scale
                          legend = T)
-dev.off()
+# dev.off()
 
 ## The following code will add border to your Phase column annotation
 # library(grid)

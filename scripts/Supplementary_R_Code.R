@@ -61,14 +61,16 @@ expressed <-
 # list of genes that show "No expression"
 no.expression <- setdiff(all.Cflo.genes, some.expression)
 
-# Save list of genes with "no_expression"
-cflo.annots.exp %>% 
-  filter(gene_name %in% no.expression) %>% 
-  write.csv(., file = "./results/gene_lists/no_exp.csv")
-# run enrichment analysis for no.expression geneset against all Cflo genes
-no.expression %>% 
-  cflo_go_enrichment(bg=all.Cflo.genes) %>% 
-  write.csv(., file = "./results/enrichment_results/no_exp.csv")
+# # Save list of genes with "no_expression"
+# cflo.annots.exp %>% 
+#   filter(gene_name %in% no.expression) %>% 
+#   write.csv(., file = "./results/gene_lists/no_exp.csv")
+
+# # run enrichment analysis for no.expression geneset against all Cflo genes
+# no.expression %>% 
+#   cflo_go_enrichment(bg=all.Cflo.genes) %>% 
+#   write.csv(., file = "./results/enrichment_results/no_exp.csv")
+
 # plot the enrichment results
 no.expression %>%
 	cflo_go_enrichment(bg=all.Cflo.genes) %>% 
@@ -80,14 +82,16 @@ no.expression %>%
 # list of genes that show "Low expression"
 low.expression <- setdiff(some.expression, expressed)
 
-# Save list to a csv
-cflo.annots.exp %>% 
-  filter(gene_name %in% low.expression) %>% 
-  write.csv(., file = "./results/gene_lists/low_exp.csv")
-# Save enrichment results to a csv
-low.expression %>% 
-  cflo_go_enrichment(bg=all.Cflo.genes) %>%
-  write.csv(., file = "./results/enrichment_results/low_exp.csv")
+# # Save list to a csv
+# cflo.annots.exp %>% 
+#   filter(gene_name %in% low.expression) %>% 
+#   write.csv(., file = "./results/gene_lists/low_exp.csv")
+
+# # Save enrichment results to a csv
+# low.expression %>% 
+#   cflo_go_enrichment(bg=all.Cflo.genes) %>%
+#   write.csv(., file = "./results/enrichment_results/low_exp.csv")
+
 # plot the enrichment results
 low.expression %>% 
   cflo_go_enrichment(bg=all.Cflo.genes) %>%
@@ -125,13 +129,16 @@ dat.n <- cflo.annots.exp %>%
 	bg.genes <- unique(c(bg.genes.f, bg.genes.n))
   ## "bg.genes" will be used as the background geneset for 
 	## further functional enrichment analyses
+	## Note: "bg.genes" is the same as "expressed"
 	
 ## What are the uniquely expressed genes in the forager ant brain?
 ## FORAGERS
-# save the list to a csv
-cflo.annots.exp %>% 
-  filter( gene_name %in% setdiff(bg.genes.f, bg.genes.n)) %>% 
-  write.csv(., "./results/gene_lists/uniquely_exp_for.csv")
+
+# # save the list to a csv
+# cflo.annots.exp %>% 
+#   filter( gene_name %in% setdiff(bg.genes.f, bg.genes.n)) %>% 
+#   write.csv(., "./results/gene_lists/uniquely_exp_for.csv")
+
 # run enrichment 
 for.only.enriched <- setdiff(bg.genes.f, bg.genes.n) %>% 
     cflo_go_enrichment(bg = bg.genes) 
@@ -140,10 +147,11 @@ for.only.enriched %>%
   go_enrichment_plot(fdr = 5, clean = "no") # set clean = "yes" to remove text annotations
 
 ## NURSES
-# save the list to a csv
-cflo.annots.exp %>% 
-  filter( gene_name %in% setdiff(bg.genes.n, bg.genes.f)) %>% 
-  write.csv(., "./results/gene_lists/uniquely_exp_nur.csv")
+# # save the list to a csv
+# cflo.annots.exp %>% 
+#   filter( gene_name %in% setdiff(bg.genes.n, bg.genes.f)) %>% 
+#   write.csv(., "./results/gene_lists/uniquely_exp_nur.csv")
+
 # run enrichment 
 nur.only.enriched <- 
    setdiff(bg.genes.n, bg.genes.f) %>%
@@ -396,16 +404,17 @@ for24.daypeaking.cluster2 <-
   pull(gene) %>%
   cflo_go_enrichment(bg = bg.genes)
   
-# save results #
-write.csv(for24.daypeaking.cluster2, file = "./results/enrichment_results/rhythmic_genes/for24_daypeaking_cluster2.csv")
+# # save results #
+# write.csv(for24.daypeaking.cluster2, file = "./results/enrichment_results/rhythmic_genes/for24_daypeaking_cluster2.csv")
+
 # save plot with enrichment results
-png("./results/enrichment_results/rhythmic_genes/for24_daypeaking_cluster2.png",
-     width = 18, height = 30, units = "cm",
-     res = 300)
+# png("./results/enrichment_results/rhythmic_genes/for24_daypeaking_cluster2.png",
+#      width = 18, height = 30, units = "cm",
+#      res = 300)
   # plot enrichment results   
   for24.daypeaking.cluster2 %>%
    go_enrichment_plot()
-dev.off()
+# dev.off()
 
 
 ## night-peaking | cluster 1 ##
@@ -416,14 +425,15 @@ for24.nightpeaking.cluster1 <-
   pull(gene) %>%
   cflo_go_enrichment(bg = bg.genes)
 
-# save results #
-write.csv(for24.nightpeaking.cluster1, file = "./results/enrichment_results/rhythmic_genes/for24_nightpeaking_cluster1.csv")
-png("./results/enrichment_results/rhythmic_genes/for24_nightpeaking_cluster1.png",
-    width = 18, height = 30, units = "cm",
-    res = 300)
+# # save results #
+# write.csv(for24.nightpeaking.cluster1, file = "./results/enrichment_results/rhythmic_genes/for24_nightpeaking_cluster1.csv")
+
+# png("./results/enrichment_results/rhythmic_genes/for24_nightpeaking_cluster1.png",
+#     width = 18, height = 30, units = "cm",
+#     res = 300)
 	for24.nightpeaking.cluster1 %>%
 	  go_enrichment_plot()
-dev.off()
+# dev.off()
 
 
 ### NURSES ###
@@ -436,14 +446,15 @@ nur24.daypeaking.cluster1 <-
   pull(gene) %>% 
   cflo_go_enrichment(bg = bg.genes)
 
-# save results #
-write.csv(nur24.daypeaking.cluster1, file = "./results/enrichment_results/rhythmic_genes/nur24_daypeaking_cluster1.csv")
-png("./results/enrichment_results/rhythmic_genes/nur24_daypeaking_cluster1.png",
-    width = 18, height = 8, units = "cm",
-    res = 300)
+# # save results #
+# write.csv(nur24.daypeaking.cluster1, file = "./results/enrichment_results/rhythmic_genes/nur24_daypeaking_cluster1.csv")
+
+# png("./results/enrichment_results/rhythmic_genes/nur24_daypeaking_cluster1.png",
+#     width = 18, height = 8, units = "cm",
+#     res = 300)
  nur24.daypeaking.cluster1 %>%
   go_enrichment_plot()
-dev.off()
+# dev.off()
 
 
 ## night-peaking | cluster 2 ##
@@ -462,18 +473,189 @@ nur24.nightpeaking.cluster3 <-
   pull(gene) %>% 
   cflo_go_enrichment(bg = bg.genes)
 
-# save results #
-write.csv(nur24.nightpeaking.cluster2, file = "./results/enrichment_results/rhythmic_genes/nur24_nightpeaking_cluster2.csv")
-write.csv(nur24.nightpeaking.cluster3, file = "./results/enrichment_results/rhythmic_genes/nur24_nightpeaking_cluster3.csv")
+# # save results #
+# write.csv(nur24.nightpeaking.cluster2, file = "./results/enrichment_results/rhythmic_genes/nur24_nightpeaking_cluster2.csv")
+# write.csv(nur24.nightpeaking.cluster3, file = "./results/enrichment_results/rhythmic_genes/nur24_nightpeaking_cluster3.csv")
 
-png("./results/enrichment_results/rhythmic_genes/nur24_nightpeaking_cluster3.png",
-    width = 18, height = 8, units = "cm",
-    res = 300)
+# png("./results/enrichment_results/rhythmic_genes/nur24_nightpeaking_cluster3.png",
+#     width = 18, height = 8, units = "cm",
+#     res = 300)
  nur24.nightpeaking.cluster3 %>%
   go_enrichment_plot()
-dev.off()
+# dev.off()
 
 #########################################################################################
 
+ 
+# Additional analyses [Reviewer #2] ---------------------------------------
+
+# 01_Is night-time activity peak of certain GO terms due to similar genes or different? -----
+
+### [Lines 380-382]
+  
+selectedGOs <- c("GO:0006355", # regulation of transcription (DNA-templated)
+                 "GO:0007165", # signal transduction
+                 "GO:0006468") # protein phosphorylation
+
+overlap.selectedGOs <- list()
+ 
+for (i in 1:length(selectedGOs)) {
+  
+  ### DATA PREP ###
+  # get the list of genes annotated with selectedGOs[i] in the night-peaking cluster in foragers
+  for.selectedGOs.genes <- 
+    for24.nightpeaking.cluster1 %>% 
+    filter(GO %in% selectedGOs[[i]]) %>% 
+    separate_rows(.,gene_name, sep=", ") %>% 
+    pull(gene_name)
+  
+  # get the list of genes annotated with selectedGOs[i] in the night-peaking cluster in nurses
+  nur.selectedGOs.genes <- 
+    rbind(nur24.nightpeaking.cluster2, nur24.nightpeaking.cluster3) %>% 
+    filter(GO %in% selectedGOs[[i]]) %>% 
+    separate_rows(.,gene_name, sep=", ") %>% 
+    pull(gene_name)
+  
+  # number of genes in the background set with the selected GO term
+  all.selectedGOs.genes <- 
+    for24.nightpeaking.cluster1 %>% 
+    filter(GO %in% selectedGOs[[i]]) %>%
+    pull(n_GO)
+  
+  ### RUN ANALYSIS ###
+  # Let's test for overlap now
+  library(GeneOverlap)
+  go.obj <- newGeneOverlap(listA = for.selectedGOs.genes,
+                           listB = nur.selectedGOs.genes,
+                           # genome.size = length(bg.genes))
+                           genome.size = all.selectedGOs.genes)
+  go.obj <- testGeneOverlap(go.obj)
+  
+  ### MAKE OUTPUT ###
+  # save the odds ratio
+  overlap.selectedGOs[[i]] <- paste0("Odds-ratio = ", round(getOddsRatio(go.obj),3), 
+                                     "; p-value = ", round(getPval(go.obj),3))
+  names(overlap.selectedGOs)[[i]] <- selectedGOs[[i]]
+  
+}  
+
+overlap.selectedGOs
+
+# For sanity, let's check if the day-peaking set of genes involved in 
+# GPI anchor biosynthetic process (GO:0006506) in foragers and nurses are overlapping or not.
+
+### DATA PREP ###
+selectedGO <- "GO:0006506" # GPI anchor biosynthetic process
+for.selectedGOs.genes <- 
+  for24.daypeaking.cluster2 %>% 
+  filter(GO %in% selectedGO) %>% 
+  separate_rows(.,gene_name, sep=", ") %>% 
+  pull(gene_name)
+nur.selectedGOs.genes <- 
+  nur24.daypeaking.cluster1 %>% 
+  filter(GO %in% selectedGO) %>% 
+  separate_rows(.,gene_name, sep=", ") %>% 
+  pull(gene_name)
+# number of genes in the background set with the selected GO term
+all.selectedGOs.genes <- 
+  nur24.daypeaking.cluster1 %>% 
+  filter(GO %in% selectedGO) %>%
+  pull(n_GO)
+### RUN ANALYSIS ###
+library(GeneOverlap)
+go.obj <- newGeneOverlap(listA = for.selectedGOs.genes,
+                         listB = nur.selectedGOs.genes,
+                         genome.size = all.selectedGOs.genes)
+go.obj <- testGeneOverlap(go.obj)
+
+### MAKE OUTPUT ###
+# save the odds ratio
+overlap.selectedGO <- paste0("Odds-ratio = ", round(getOddsRatio(go.obj),3), 
+                                   "; p-value = ", round(getPval(go.obj),3))
+overlap.selectedGO
 
 
+# 02_Are genes annotated to the clock more likely to have an 8h cycle in nurses than expected? -----
+
+### [Lines 507-509]
+# Even though the 8h rhythms of Dbt (p=0.11) and Nemo (p=0.11) in nurse brains were not 
+# statistically significant, their expression patterns showed a strong phase coherence with Per.
+
+# Note to self: 
+#   Not sure how clearly we can have a set of genes that are “annotated to the clock”. 
+#   One option would be to use the list of core-clock and clock-controlled genes that we borrowed 
+#   from Romanowski et al. and then do an over-representation analysis.
+
+
+# 03_Are the genes involved in circadian entraiment enriched for for24nur8 DRGs? -----
+
+### [Lines 584-586]
+# Even though neither of the melatonin receptors were cycling in nurse brains, 
+# we found that Pkc oscillated every 8 hours while it does so every 24 hours in foragers (Table 1)
+
+# Note to self: 
+# I am not sure I understand what the reviewer wants me to test. 
+# I am assuming that the reviewer wants us to test if 8h rhythms are over-represented 
+# in the genes involved in circadian entrainment pathway. Ask @Charissa, does it sound right?
+
+### DATA PREP ###
+genes.mammalian.circa.entrainment <- read.csv("./results/supp_files/supp_file_6/Cflo_ortho_mammal_circa_entrain.csv",
+                                              header = T)
+circa.entrainment <- 
+  genes.mammalian.circa.entrainment %>% 
+  pull(Cflo_ortholog) %>% 
+  as.character() %>% 
+  unique()
+
+for24.nur8 <- intersect(for24, nur8)
+
+### RUN ANALYSES ###
+library(GeneOverlap)
+go.obj <- newGeneOverlap(listA = circa.entrainment,
+                         listB = for24.nur8,
+                         genome.size = length(bg.genes))
+go.obj <- testGeneOverlap(go.obj)
+
+### MAKE OUTPUT ###
+# save the odds ratio
+overlap.pairwise <- paste0("Odds-ratio = ", round(getOddsRatio(go.obj),3), 
+                             "; p-value = ", round(getPval(go.obj),3))
+overlap.pairwise
+go.obj %>% print()
+
+
+# 04_Are the DEGs enriched for rhythmic genes? -----
+
+# Load the results of the DEG analysis (dataframe: deLimma.deg)
+load(file = "~/Documents/GitHub/R-scripts_zombie_ant_lab/Functions/data/DEGs/TC5_DEG_results.RData")
+
+# Set threshold for q-value (BH adjusted p-value)
+q.threshold <- 0.05 # currently, using 5% FDR
+log2.foldchange <- 1 # thus, any gene with a 2^(log2.foldchange) fold change in it's expression
+#
+
+# list of DEGs
+for.nur.degs <- 
+  deLimma.deg %>% 
+  filter(adj.P.Val < q.threshold) %>% 
+  filter(abs(logFC) >= log2.foldchange) %>% 
+  pull(gene_name)
+
+# list of 24h genes
+for.nur.24h <- union(for24, nur24)
+
+# list of ultradian genes
+for.nur.12h.8h <- unique(c(for12,nur12,for8,nur8))
+
+library(GeneOverlap)
+go.obj <- newGeneOverlap(listA = for.nur.degs,
+                         listB = for.nur.12h.8h, # change to for.nur.24h to test enrichment for 24h cycling genes
+                         genome.size = length(bg.genes))
+go.obj <- testGeneOverlap(go.obj)
+
+### MAKE OUTPUT ###
+# save the odds ratio
+overlap.pairwise <- paste0("Odds-ratio = ", round(getOddsRatio(go.obj),3), 
+                           "; p-value = ", round(getPval(go.obj),3))
+overlap.pairwise
+go.obj %>% print()

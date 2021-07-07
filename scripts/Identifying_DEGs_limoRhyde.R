@@ -183,6 +183,13 @@ log2.foldchange <- 1 # thus, any gene with a 2^(log2.foldchange) fold change in 
 # Load the results of the DEG analysis (dataframe: deLimma.deg)
 load(file = "~/Documents/GitHub/R-scripts_zombie_ant_lab/Functions/data/DEGs/TC5_DEG_results.RData")
 
+
+# How many genes have an adj.P.Val < 0.05 (NO fold-change criterion)
+deLimma.deg %>% 
+  filter(adj.P.Val < 0.05) %>% 
+  nrow()
+
+
 # Filter the results to keep only the significant genes
 tc5.all.DEGs <- 
   deLimma.deg %>% 
