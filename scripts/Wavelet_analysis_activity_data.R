@@ -117,7 +117,7 @@ dat %>% glimpse()
 
 pd <- position_dodge(0.1)
 
-png("./results/figures/figure_1/Entrain_I_FA.png", 
+png("./results/figures/figure_1/01_revised_figure_1/Entrain_I_Total.png", 
     width = 1400, height = 800, res = 300)
 # create summary
 dat %>% 
@@ -127,11 +127,11 @@ dat %>%
   # make the summary table
   summarySE(.,
               # specify your measurevar (FA/FS/Total)
-              measurevar= "FA", 
+              measurevar= "Total", 
               groupvars=c("ZT","Phase")) %>%
     
     # make the value column
-    mutate(value=FA) %>% 
+    mutate(value=Total) %>% 
     
   # Plot
   ggplot(aes(x= as.numeric(as.character(ZT)), y=value)) +
@@ -155,9 +155,9 @@ dat %>%
     geom_rect(aes(xmin = 11.8, xmax = 23.8, ymin = -Inf, ymax = Inf),
               fill = "lightgrey", alpha = 0.02, color=NA) +
     geom_line(position=pd,
-              # col="#F2CB05", size=2, alpha=1) + # total
+              col="#F2CB05", size=2, alpha=1) + # total
               # col="#BF0404", size=2, alpha=1) + # FS
-              col="#0FBF67", size=2, alpha=1) + # FA
+              # col="#0FBF67", size=2, alpha=1) + # FA
               
     
     ## Add error bar here
@@ -173,7 +173,12 @@ dat %>%
     # scale_fill_manual(values = c("black","#F20505","#F2CB05","#0FBF67")) +
     # scale_color_manual(values=c("#F20505","#F5D736","#0FBF67")) +
     theme(text = element_text(size = 25, colour = 'black'),
-          legend.position = "none")
+          legend.position = "none") +
+  
+    # [as per reviewer request]
+    # forcing the y-axis to start at 0
+    expand_limits(x = 0, y = 0)
+
 dev.off()
 
 
@@ -240,71 +245,11 @@ dev.off()
 # Entrain-II (Continued entrainment/Pre-sampling entrainment) --------------
 pd <- position_dodge(0.1)
 
-png("./results/figures/figure_1/Entrain_II_FA.png", 
+png("./results/figures/figure_1/01_revised_figure_1/Entrain_II_Total.png", 
     width = 1400, height = 800, res = 300)
 # create summary
 summarySE(data=(dat %>% 
                   filter(Phase == "Entrain-II")), 
-          
-          # specify your measurevar (FA/FS/Total)
-          measurevar= "FA", 
-          groupvars=c("ZT","Phase")) %>%
-  
-  # make the value column
-  mutate(value=FA) %>% 
-  
-  # Plot
-  ggplot(aes(x= as.numeric(as.character(ZT)), y=value)) +
-  theme_Publication() +
-  scale_colour_Publication() +
-  xlab("") +
-  ylab("") +
-  ggtitle("") +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        legend.position='none',
-        # legend.title = element_text(size = 15, colour = 'black'),
-        legend.text = element_blank()) +
-  ## center align the title
-  theme(plot.title = element_blank()) +
-  scale_x_continuous(breaks = c(0,12,24)) +
-  #scale_y_continuous(limits = c(0,40)) +
-  theme(panel.grid.major.x = element_line(colour = "#808080", size=0.1),
-        panel.grid.major.y = element_line(colour = "#808080", size=0.2)) +
-  ## if you need highlighting parts of the graph
-  geom_rect(aes(xmin = 11.8, xmax = 23.8, ymin = -Inf, ymax = Inf),
-            fill = "lightgrey", alpha = 0.02, color=NA) +
-  geom_line(position=pd,
-            # col="#F2CB05", size=2, alpha=1) + # total
-            # col="#BF0404", size=2, alpha=1) + # FS
-            col="#0FBF67", size=2, alpha=1) + # FA
-  
-  
-  ## Add error bar here
-  geom_errorbar(aes(ymin=value-se, ymax=value+se), 
-                width=.4, position=pd, col="black", alpha = 0.7) +
-  
-  # Add the points on top of the error bars
-  geom_point(position=pd, size=2.5,
-             col="black", fill="black",
-             show.legend = F, color="black", pch=21, alpha=0.9) +
-  
-  #facet_wrap(~Phase, nrow=2)
-  # scale_fill_manual(values = c("black","#F20505","#F2CB05","#0FBF67")) +
-  # scale_color_manual(values=c("#F20505","#F5D736","#0FBF67")) +
-  theme(text = element_text(size = 25, colour = 'black'),
-        legend.position = "none")
-dev.off()
-
-
-# Sampling (24h of Sampling) --------------
-pd <- position_dodge(0.1)
-
-png("./results/figures/figure_1/Sampling_Total.png", 
-    width = 1400, height = 800, res = 300)
-# create summary
-summarySE(data=(dat %>% 
-                  filter(Phase == "Sampling")), 
           
           # specify your measurevar (FA/FS/Total)
           measurevar= "Total", 
@@ -353,18 +298,23 @@ summarySE(data=(dat %>%
   # scale_fill_manual(values = c("black","#F20505","#F2CB05","#0FBF67")) +
   # scale_color_manual(values=c("#F20505","#F5D736","#0FBF67")) +
   theme(text = element_text(size = 25, colour = 'black'),
-        legend.position = "none")
+        legend.position = "none") +
+  
+  # [as per reviewer request]
+  # forcing the y-axis to start at 0
+  expand_limits(x = 0, y = 0)
+
 dev.off()
 
 
-# Entrain-III (Post-sampling entrainment) --------------
+# Sampling (24h of Sampling) --------------
 pd <- position_dodge(0.1)
 
-png("./results/figures/figure_1/Entrain_III_FA.png", 
+png("./results/figures/figure_1/01_revised_figure_1/Sampling_FA.png", 
     width = 1400, height = 800, res = 300)
 # create summary
 summarySE(data=(dat %>% 
-                  filter(Phase == "Entrain-III")), 
+                  filter(Phase == "Sampling")), 
           
           # specify your measurevar (FA/FS/Total)
           measurevar= "FA", 
@@ -409,6 +359,71 @@ summarySE(data=(dat %>%
              col="black", fill="black",
              show.legend = F, color="black", pch=21, alpha=0.9) +
   
+  #facet_wrap(~Phase, nrow=2)
+  # scale_fill_manual(values = c("black","#F20505","#F2CB05","#0FBF67")) +
+  # scale_color_manual(values=c("#F20505","#F5D736","#0FBF67")) +
+  theme(text = element_text(size = 25, colour = 'black'),
+        legend.position = "none") +
+  
+  # [as per reviewer request]
+  # forcing the y-axis to start at 0
+  expand_limits(x = 0, y = 0)
+
+dev.off()
+
+
+# Entrain-III (Post-sampling entrainment) --------------
+pd <- position_dodge(0.1)
+
+png("./results/figures/figure_1/01_revised_figure_1/Entrain_III_FS.png", 
+    width = 1400, height = 800, res = 300)
+# create summary
+summarySE(data=(dat %>% 
+                  filter(Phase == "Entrain-III")), 
+          
+          # specify your measurevar (FA/FS/Total)
+          measurevar= "FS", 
+          groupvars=c("ZT","Phase")) %>%
+  
+  # make the value column
+  mutate(value=FS) %>% 
+  
+  # Plot
+  ggplot(aes(x= as.numeric(as.character(ZT)), y=value)) +
+  theme_Publication() +
+  scale_colour_Publication() +
+  xlab("") +
+  ylab("") +
+  ggtitle("") +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        legend.position='none',
+        # legend.title = element_text(size = 15, colour = 'black'),
+        legend.text = element_blank()) +
+  ## center align the title
+  theme(plot.title = element_blank()) +
+  scale_x_continuous(breaks = c(0,12,24)) +
+  #scale_y_continuous(limits = c(0,40)) +
+  theme(panel.grid.major.x = element_line(colour = "#808080", size=0.1),
+        panel.grid.major.y = element_line(colour = "#808080", size=0.2)) +
+  ## if you need highlighting parts of the graph
+  geom_rect(aes(xmin = 11.8, xmax = 23.8, ymin = -Inf, ymax = Inf),
+            fill = "lightgrey", alpha = 0.02, color=NA) +
+  geom_line(position=pd,
+            # col="#F2CB05", size=2, alpha=1) + # total
+            col="#BF0404", size=2, alpha=1) + # FS
+            # col="#0FBF67", size=2, alpha=1) + # FA
+  
+  
+  ## Add error bar here
+  geom_errorbar(aes(ymin=value-se, ymax=value+se), 
+                width=.4, position=pd, col="black", alpha = 0.7) +
+  
+  # Add the points on top of the error bars
+  geom_point(position=pd, size=2.5,
+             col="black", fill="black",
+             show.legend = F, color="black", pch=21, alpha=0.9) +
+  
   # set y-axis breaks
   scale_y_continuous(breaks = seq(0, 14, by = 3)) +
   
@@ -416,12 +431,17 @@ summarySE(data=(dat %>%
   # scale_fill_manual(values = c("black","#F20505","#F2CB05","#0FBF67")) +
   # scale_color_manual(values=c("#F20505","#F5D736","#0FBF67")) +
   theme(text = element_text(size = 25, colour = 'black'),
-        legend.position = "none") 
+        legend.position = "none") +
+  
+  # [as per reviewer request]
+  # forcing the y-axis to start at 0
+  expand_limits(x = 0, y = 0)
+
 dev.off()
 
 
 
-# Calculating number of observations per phase ----------------------------
+ # Calculating number of observations per phase ----------------------------
 
 # Summarise
 dat %>% 
