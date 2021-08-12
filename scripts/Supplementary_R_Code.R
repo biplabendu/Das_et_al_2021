@@ -24,6 +24,7 @@ cflo.annots.exp <- tbl(db, "annot_fpkm") %>% collect()
 # - go_enrichment_plot
 source(file = "./functions/enrichment_analysis.R")
 source(file = "./functions/plot_zscores.R")
+source(file = "./functions/theme_publication.R")
 
 
 #########################################################################################
