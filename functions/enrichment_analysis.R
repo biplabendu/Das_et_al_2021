@@ -2,7 +2,7 @@
 
 
 # 1. GO enrichment - Function --------------------------------------------------
-cflo_go_enrichment <- function(geneset, bg = "expressed", atleast = 5, enriched.terms="over") {
+cflo_go_enrichment <- function(geneset, bg = "expressed", atleast = 5, enriched.terms="over", function.dir=".") {
   
   # save the input list of genes for enrichment test
   genes <- geneset
@@ -10,7 +10,7 @@ cflo_go_enrichment <- function(geneset, bg = "expressed", atleast = 5, enriched.
   # Load the required libraries
   library(tidyverse)
   ## load the core datasets
-  load("./functions/func_data/TC5_core_datasets.RData")
+  load(paste0(function.dir,"/functions/func_data/TC5_core_datasets.RData"))
   #' Select only the columns that we need
   all_genes <- cflo.annots.exp 
   all_genes <- all_genes[,c("gene_name","GOs","pfams","signalP","TMHMM")]
@@ -35,7 +35,7 @@ cflo_go_enrichment <- function(geneset, bg = "expressed", atleast = 5, enriched.
   }
   
   else if (bg == "expressed") { 
-    load(file = "./functions/func_data/cflo_expressed_genes.RData")
+    load(file = paste0(function.dir,"/functions/func_data/cflo_expressed_genes.RData"))
     bg <- bg.genes
     background <- all_genes_gos %>% 
       # can filter the background geneset here
@@ -186,15 +186,16 @@ cflo_go_enrichment <- function(geneset, bg = "expressed", atleast = 5, enriched.
 
 # 2. plotting GO enrichments ----------------------------------------------
 
-go_enrichment_plot <- function(data, category, fdr=5, clean="yes") {
+go_enrichment_plot <- function(data, category, fdr=5, clean="yes", function.dir=".") {
   
-  source("./functions/theme_publication.R")
+  source(paste0(function.dir,"/functions/theme_publication.R"))
   
   #Save the data to an object
   df <- data
   
   # Let's read the file with all Cflo GO terms and their categories
-  cflo_gos <- read.csv("./functions/func_data/Cflo_distinct_gos_namespace.csv", header = T, stringsAsFactors = F)
+  cflo_gos <- read.csv(paste0(function.dir,"/functions/func_data/Cflo_distinct_gos_namespace.csv"), 
+                              header = T, stringsAsFactors = F)
   cflo_gos <- cflo_gos %>% 
     dplyr::select(1:3) %>% 
     dplyr::select(GO = "GOTerm.identifier", GO_category = "GOTerm.namespace") 
@@ -307,6 +308,7 @@ go_enrichment_plot <- function(data, category, fdr=5, clean="yes") {
 # 3. Plotting heat maps ------------------------------------------------------
 
 cflo_heatmap <- function(geneset, 
+                         function.dir=".",
                          cluster.r=F, cluster.c=F,
                          cutree_cols = 1,
                          title="Heatmap (z-score)", 
@@ -319,8 +321,8 @@ cflo_heatmap <- function(geneset,
   library(viridis)
   
   # Let's load the datasets:
-  load(file = "./functions/func_data/TC5_core_datasets.RData")
-  load(file = "./functions/func_data/gene_to_annot.RData")
+  load(file = paste0(function.dir,"/functions/func_data/TC5_core_datasets.RData"))
+  load(file = paste0(function.dir,"/functions/func_data/gene_to_annot.RData"))
   
   oldnames.for <- names(cflo.zscores.for[,-1])
   oldnames.nur <- names(cflo.zscores.nur[,-1])
